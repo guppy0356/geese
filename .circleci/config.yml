@@ -12,6 +12,10 @@ jobs:
       - sam/local-start-api:
           template: template.yaml
           endpoint: hello
+      - run:
+          name: curl
+          command: |
+            curl -X GET http://127.0.0.1:3000/hello
 
 workflows:
   integration-test_deploy:
