@@ -1,40 +1,19 @@
-version: 2
+version: 2.1
+
+orbs:
+  sam: circleci/aws-sam-serverless@2.1.0
 
 jobs:
-  deploy-dev:
-    machine: true
+  test_local_invoke:
+    executor: sam/default
     steps:
       - checkout
-      - run:
-          name: load latest
-          command: |
-            cd /opt/circleci/.pyenv
-            git pull
-      - run:
-          name: install python 3.6.3
-          command: |
-            pyenv install 3.6.3
-            pyenv global 3.6.3
-      - run:
-          name: sam build
-          command: |
-            pip install pipenv
-            python -m venv venv
-            source venv/bin/activate
-
-            pip install aws-sam-cli
-
-            sam build --use-container
-
-            sam local start-api
-          background: true
-      - run:
-          name: curl
-          command: |
-            curl -X GET http://127.0.0.1:3000/hello
+      - sam/install
+      - sam/local-start-api:
+          template: template.yaml
+          endpoint: hello
 
 workflows:
-  version: 2
-  aws-sam-build:
+  integration-test_deploy:
     jobs:
-      - deploy-dev
+      - test_local_invoke
